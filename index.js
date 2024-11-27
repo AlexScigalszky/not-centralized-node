@@ -84,7 +84,7 @@ app.get('/nodes', (req, res) => {
 app.post('/nodes', (req, res) => {
     const { nodeUrl } = req.body;
     console.log('Agregando el nodo', nodeUrl);
-    if (!knownNodes.includes(nodeUrl)) {
+    if (!knownNodes.includes(nodeUrl) && nodeUrl !== nodeUrl) {
         knownNodes.push(nodeUrl);
     }
     console.log("Nodos conocidos:", knownNodes);
