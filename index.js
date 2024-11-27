@@ -6,50 +6,40 @@ import fetch from 'node-fetch';
 const app = express();
 app.use(express.json());
 
-const nodeName = process.env.NODE_NAME;
-console.log(`Este nodo se llama: ${nodeName}`);
-
+// Url del Nodo (la forma de identificarlo)
+const nodeUrl = process.env.NODE_URL;
+// Nombre del Nodo (la forma de identificarlo)
+const nodeName = process.env.NODE_NAME ?? 'unknown name';
 // Iniciar el servidor en el puerto 3000
 const port = process.env.PORT || 3000;
 // Nodo semilla
-const seedNodeUrl = process.env.SEED_NODE_URL || 'missing seed';
+const seedNodeUrl = process.env.SEED_NODE_URLS || '';
 
 // Tiempo entre cada actualización
 var refreshTime = 60 * 60 * 1000 // 1 hora
 
 // Lista en memoria de nodos conocidos
-let knownNodes = [seedNodeUrl]; 
+let knownNodes = seedNodeUrl ? [seedNodeUrl.split(',')] : [];
+
+/************ BEGIN internal functions ************/
 
 // Función para registrar el nodo en el semilla
 async function registerNode() {
     try {
         const response = await fetch(`${seedNodeUrl}/nodes`, {
-            method: 'POST', // Método POST para registrar el nodo
+            method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ nodeUrl: nodeName, nodeName }),
+            body: JSON.stringify({ nodeUrl: nodeUrl }),
         });
         if (response.ok) {
-            console.log(`Nodo registrado: ${nodeName}`);
+            console.log(`Nodo registrado: ${nodeUrl}`);
         } else {
             console.error('Error al registrar el nodo:', response.statusText);
         }
     } catch (error) {
         console.error('Error al registrar el nodo:', error);
-    }
-}
-
-// Función para conectarse al nodo semilla
-async function connectToSeedNode() {
-    try {
-        const response = await fetch(`${seedNodeUrl}/nodes`);
-        const nodesFromSeed = await response.json();
-        knownNodes = [...new Set([...knownNodes, ...nodesFromSeed])];
-        console.log("Conectado al nodo semilla y sincronizado.");
-        console.log("Nodos conocidos:", knownNodes);
-    } catch (error) {
-        console.error("No se pudo conectar al nodo semilla:", error.message);
     }
 }
 
@@ -71,8 +61,9 @@ function syncNodes() {
         }
     });
 }
+/************ END internal functions ************/
 
-setInterval(syncNodes,refreshTime); 
+/************ BEGIN endpoints ************/
 
 // Endpoint GET /nodes - Retorna la lista de nodos
 app.get('/nodes', (req, res) => {
@@ -95,9 +86,17 @@ app.get('/ping', (req, res) => {
     res.json({ message: 'Nodo activo' });
 });
 
+app.get('/name', (req, res) => {
+    res.json({ name: nodeName });
+});
+
+/************ END endpoints ************/
+
+setInterval(syncNodes, refreshTime);
+
 app.listen(port, async () => {
-    console.log(`Servidor iniciado en el puerto ${port} (${nodeName})`);
+    console.log(`Servidor ${nodeName} iniciado en el puerto ${nodeUrl}`);
     // Registrar el nodo en el seed después de que el servidor se inicie
     await registerNode();
-    await connectToSeedNode(); // Conectar al nodo semilla al iniciar
+    syncNodes(); // Conectar al nodo semilla al iniciar
 });
