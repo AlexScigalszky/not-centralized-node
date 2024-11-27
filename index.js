@@ -12,7 +12,7 @@ console.log(`Este nodo se llama: ${nodeName}`);
 // Iniciar el servidor en el puerto 3000
 const port = process.env.PORT || 3000;
 // Nodo semilla
-const seedNodeUrl = process.env.SEED_NODE_URL || 'http://localhost:3000';
+const seedNodeUrl = process.env.SEED_NODE_URL || 'missing seed';
 
 let knownNodes = [seedNodeUrl]; // Lista en memoria de nodos conocidos
 
@@ -24,7 +24,7 @@ async function registerNode() {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ nodeUrl: `http://localhost:${port}`, nodeName }),
+            body: JSON.stringify({ nodeUrl: nodeName, nodeName }),
         });
         if (response.ok) {
             console.log(`Nodo registrado: ${nodeName}`);
@@ -61,6 +61,9 @@ function syncNodes() {
             knownNodes = [...new Set([...knownNodes, ...newNodes])];
         } catch (error) {
             console.error(`Error sincronizando con el nodo ${nodeUrl}: ${error.message}`);
+            if (knownNodes.lengh !== 0){
+                knownNodes = [...knownNodes.filter(x => x !== nodeUrl)];
+            }
         }
     });
 }
@@ -86,7 +89,6 @@ app.post('/nodes', (req, res) => {
 app.get('/ping', (req, res) => {
     res.json({ message: 'Nodo activo' });
 });
-
 
 app.listen(port, () => {
     console.log(`Servidor iniciado en el puerto ${port} (${nodeName})`);

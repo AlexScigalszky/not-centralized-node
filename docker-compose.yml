@@ -7,3 +7,35 @@ services:
       - NODE_NAME=http://localhost:3000
     ports:
       - "3000:3000"
+  node2:
+    build: .
+    container_name: node2
+    environment:
+      - NODE_NAME=http://localhost:3002
+      - SEED_NODE_URL=http://localhost:3000
+    ports:
+      - "3002:3000"
+  node3:
+    build: .
+    container_name: node3
+    environment:
+      - NODE_NAME=http://localhost:3003
+      - SEED_NODE_URL=http://localhost:3000
+    ports:
+      - "3003:3000"
+  node4:
+    build: .
+    container_name: node4
+    environment:
+      - NODE_NAME=http://localhost:3004
+      - SEED_NODE_URL=http://localhost:3000
+    ports:
+      - "3004:3000"
+  node5:
+    build: .
+    container_name: node5
+    environment:
+      - NODE_NAME=http://localhost:3005
+      - SEED_NODE_URL=http://localhost:3000
+    ports:
+      - "3005:3000"
