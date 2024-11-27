@@ -26,7 +26,8 @@ let knownNodes = seedNodeUrl ? [seedNodeUrl.split(',')] : [];
 // Función que devuelve toda la info de este nodo
 function myInfo() {
     return {
-        name: nodeName
+        name: nodeName,
+        version: '0.0.1'
     };
 }
 
