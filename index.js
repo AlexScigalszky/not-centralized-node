@@ -100,7 +100,7 @@ app.get('/info', (req, res) => {
     res.json(myInfo());
 });
 
-app.get('nodes/name', async (req, res) => {
+app.get('network', async (req, res) => {
     var rst = [myInfo()];
     for (let i = 0; i < knownNodes.length; i++) {
         const response = await fetch(`${knownNodes[i]}/info`);
