@@ -19,7 +19,7 @@ const seedNodeUrl = process.env.SEED_NODE_URLS || '';
 var refreshTime = 60 * 60 * 1000 // 1 hora
 
 // Lista en memoria de nodos conocidos
-let knownNodes = seedNodeUrl ? [seedNodeUrl.split(',')] : [];
+let knownNodes = seedNodeUrl ? [...seedNodeUrl.split(',')] : [];
 
 /************ BEGIN internal functions ************/
 
