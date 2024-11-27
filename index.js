@@ -23,6 +23,13 @@ let knownNodes = seedNodeUrl ? [seedNodeUrl.split(',')] : [];
 
 /************ BEGIN internal functions ************/
 
+// Función que devuelve toda la info de este nodo
+function myInfo() {
+    return {
+        name: nodeName
+    };
+}
+
 // Función para registrar el nodo en el semilla
 async function registerNode() {
     try {
@@ -86,8 +93,17 @@ app.get('/ping', (req, res) => {
     res.json({ message: 'Nodo activo' });
 });
 
-app.get('/name', (req, res) => {
-    res.json({ name: nodeName });
+app.get('/info', (req, res) => {
+    res.json(myInfo());
+});
+
+app.get('nodes/name', async (req, res) => {
+    var rst = [myInfo()];
+    for (let i = 0; i < knownNodes.length; i++) {
+        const response = await fetch(`${knownNodes[i]}/info`);
+        rst = [...rst, await response.json()];
+    }
+    res.json(rst);
 });
 
 /************ END endpoints ************/
