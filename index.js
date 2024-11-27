@@ -13,13 +13,13 @@ const nodeName = process.env.NODE_NAME ?? 'unknown name';
 // Iniciar el servidor en el puerto 3000
 const port = process.env.PORT || 3000;
 // Nodo semilla
-const seedNodeUrl = process.env.SEED_NODE_URLS || '';
+const seedNodeUrls = process.env.SEED_NODE_URLS || '';
 
 // Tiempo entre cada actualización
 var refreshTime = 60 * 60 * 1000 // 1 hora
 
 // Lista en memoria de nodos conocidos
-let knownNodes = seedNodeUrl ? [...seedNodeUrl.split(',')] : [];
+let knownNodes = seedNodeUrls ? [...seedNodeUrls.split(',')] : [];
 
 /************ BEGIN internal functions ************/
 
@@ -33,22 +33,24 @@ function myInfo() {
 
 // Función para registrar el nodo en el semilla
 async function registerNode() {
-    try {
-        const response = await fetch(`${seedNodeUrl}/nodes`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ nodeUrl: nodeUrl }),
-        });
-        if (response.ok) {
-            console.log(`Nodo registrado: ${nodeUrl}`);
-        } else {
-            console.error('Error al registrar el nodo:', response.statusText);
+    knownNodes.forEach(async (seedUrl) => {
+        try {
+            const response = await fetch(`${seedUrl}/nodes`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ nodeUrl }),
+            });
+            if (response.ok) {
+                console.log(`Nodo registrado: ${nodeUrl}`);
+            } else {
+                console.error('Error al registrar el nodo:', response.statusText);
+            }
+        } catch (error) {
+            console.error('Error al registrar el nodo:', error);
         }
-    } catch (error) {
-        console.error('Error al registrar el nodo:', error);
-    }
+    });
 }
 
 // Sincronizar nodos conocidos periódicamente
@@ -112,7 +114,8 @@ app.get('nodes/name', async (req, res) => {
 setInterval(syncNodes, refreshTime);
 
 app.listen(port, async () => {
-    console.log(`Servidor ${nodeName} iniciado en el puerto ${nodeUrl}`);
+    console.log(`Servidor ${nodeName} iniciado en ${nodeUrl}`);
+    console.log(`Seeds registrados ${seedNodeUrls}`);
     // Registrar el nodo en el seed después de que el servidor se inicie
     await registerNode();
     syncNodes(); // Conectar al nodo semilla al iniciar
