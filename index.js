@@ -14,7 +14,11 @@ const port = process.env.PORT || 3000;
 // Nodo semilla
 const seedNodeUrl = process.env.SEED_NODE_URL || 'missing seed';
 
-let knownNodes = [seedNodeUrl]; // Lista en memoria de nodos conocidos
+// Tiempo entre cada actualización
+var refreshTime = 60 * 60 * 1000 // 1 hora
+
+// Lista en memoria de nodos conocidos
+let knownNodes = [seedNodeUrl]; 
 
 // Función para registrar el nodo en el semilla
 async function registerNode() {
@@ -28,9 +32,9 @@ async function registerNode() {
         });
         if (response.ok) {
             console.log(`Nodo registrado: ${nodeName}`);
-          } else {
+        } else {
             console.error('Error al registrar el nodo:', response.statusText);
-          }
+        }
     } catch (error) {
         console.error('Error al registrar el nodo:', error);
     }
@@ -61,13 +65,14 @@ function syncNodes() {
             knownNodes = [...new Set([...knownNodes, ...newNodes])];
         } catch (error) {
             console.error(`Error sincronizando con el nodo ${nodeUrl}: ${error.message}`);
-            if (knownNodes.lengh !== 0){
+            if (knownNodes.lengh !== 0) {
                 knownNodes = [...knownNodes.filter(x => x !== nodeUrl)];
             }
         }
     });
 }
-setInterval(syncNodes, 30000); // Ejecutar cada 30 segundos
+
+setInterval(syncNodes,refreshTime); 
 
 // Endpoint GET /nodes - Retorna la lista de nodos
 app.get('/nodes', (req, res) => {
@@ -90,9 +95,9 @@ app.get('/ping', (req, res) => {
     res.json({ message: 'Nodo activo' });
 });
 
-app.listen(port, () => {
+app.listen(port, async () => {
     console.log(`Servidor iniciado en el puerto ${port} (${nodeName})`);
     // Registrar el nodo en el seed después de que el servidor se inicie
-    registerNode();
-    connectToSeedNode(); // Conectar al nodo semilla al iniciar
+    await registerNode();
+    await connectToSeedNode(); // Conectar al nodo semilla al iniciar
 });
