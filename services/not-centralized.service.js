@@ -5,7 +5,7 @@ import { listOtherNodes, listKnownNodes, localInfo, listSeedNodes, saveKnownNode
 export async function syncNodes() {
     console.log("Sincronizando...")
     console.log("Nodos conocidos:", listKnownNodes());
-    var otherNodes = otherNodes();
+    var otherNodes = listOtherNodes();
     for (let i = 0; i < otherNodes.length; i++) {
         const nodeUrl = otherNodes[i];
         try {
@@ -47,7 +47,7 @@ export function myInfo() {
 // Registrar nodo en los nodos semilla
 export async function networkInfo() {
     var rst = [myInfo()];
-    var otherNodes = otherNodes();
+    var otherNodes = listOtherNodes();
     for (let i = 0; i < otherNodes.length; i++) {
         const response = await fetch(`${otherNodes[i]}/info`);
         rst = [...rst, await response.json()];
