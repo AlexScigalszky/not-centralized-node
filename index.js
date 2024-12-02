@@ -53,8 +53,16 @@ async function registerNode() {
     });
 }
 
-// Sincronizar nodos conocidos periódicamente
-function syncNodes() {
+/************ END internal functions ************/
+
+/************ BEGIN endpoints ************/
+
+// Endpoint GET /nodes - Retorna la lista de nodos
+app.get('/nodes', (req, res) => {
+    res.json(knownNodes);
+});
+// Endpoint GET /sync para realizar la actualización de nodos conocidos
+app.get('/sync', async (req, res) => {
     console.log("Sincronizando...")
     console.log("Nodos conocidos:", knownNodes);
     knownNodes.forEach(async (nodeUrl) => {
@@ -70,14 +78,7 @@ function syncNodes() {
             }
         }
     });
-}
-/************ END internal functions ************/
-
-/************ BEGIN endpoints ************/
-
-// Endpoint GET /nodes - Retorna la lista de nodos
-app.get('/nodes', (req, res) => {
-    res.json(knownNodes);
+    res.json({ status: "ok" });
 });
 
 // Endpoint POST /nodes - Registra un nuevo nodo
@@ -110,8 +111,6 @@ app.get('/network', async (req, res) => {
 });
 
 /************ END endpoints ************/
-
-setInterval(syncNodes, refreshTime);
 
 app.listen(port, async () => {
     console.log(`Servidor ${nodeName} iniciado en ${nodeUrl}`);
