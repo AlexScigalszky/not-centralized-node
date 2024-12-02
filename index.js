@@ -15,9 +15,6 @@ const port = process.env.PORT || 3000;
 // Nodo semilla
 const seedNodeUrls = process.env.SEED_NODE_URLS || '';
 
-// Tiempo entre cada actualización
-var refreshTime = 60 * 60 * 1000 // 1 hora
-
 // Lista en memoria de nodos conocidos
 let knownNodes = seedNodeUrls ? [...seedNodeUrls.split(',')] : [];
 
@@ -53,6 +50,23 @@ async function registerNode() {
     });
 }
 
+function syncNodes() {
+    console.log("Sincronizando...")
+    console.log("Nodos conocidos:", knownNodes);
+    knownNodes.forEach(async (nodeUrl) => {
+        try {
+            console.log("Sincronizando con el nodo", nodeUrl);
+            const response = await fetch(`${nodeUrl}/nodes`);
+            const newNodes = await response.json();
+            knownNodes = [...new Set([...knownNodes, ...newNodes])];
+        } catch (error) {
+            console.error(`Error sincronizando con el nodo ${nodeUrl}: ${error.message}`);
+            if (knownNodes.lengh !== 0) {
+                knownNodes = [...knownNodes.filter(x => x !== nodeUrl)];
+            }
+        }
+    });
+}
 /************ END internal functions ************/
 
 /************ BEGIN endpoints ************/
@@ -61,6 +75,7 @@ async function registerNode() {
 app.get('/nodes', (req, res) => {
     res.json(knownNodes);
 });
+
 // Endpoint GET /sync para realizar la actualización de nodos conocidos
 app.get('/sync', async (req, res) => {
     console.log("Sincronizando...")
