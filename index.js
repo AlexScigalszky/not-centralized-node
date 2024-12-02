@@ -46,7 +46,7 @@ async function registerNode() {
         try {
             const response = await postNodes(seedUrl);
             if (response.ok) {
-                console.log(`Nodo registrado: ${localNodeUrl}`);
+                console.log(`Nodo registrado: ${localNodeUrl} en seed: ${seedUrl}`);
             } else {
                 console.error('Error al registrar el nodo:', response.statusText);
             }
