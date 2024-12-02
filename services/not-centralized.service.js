@@ -1,11 +1,11 @@
 import fetch from 'node-fetch';
-import { localNodeUrl, knownNodes, nodeName, seedNodeUrls, updateKnownNodes } from '../config.js';
+import { listOtherNodes, listKnownNodes, locaInfo, listSeedNodes, updateKnownNodes } from '../repository/in-memory.js';
 
 // Sincronizar nodos
 export async function syncNodes() {
     console.log("Sincronizando...")
-    console.log("Nodos conocidos:", knownNodes);
-    var otherNodes = knownNodes.filter(n => n !== localNodeUrl);
+    console.log("Nodos conocidos:", listKnownNodes());
+    var otherNodes = otherNodes();
     for (let i = 0; i < otherNodes.length; i++) {
         const nodeUrl = otherNodes[i];
         try {
@@ -15,17 +15,17 @@ export async function syncNodes() {
             updateKnownNodes(status.knownNodes);
         } catch (error) {
             console.error(`Error sincronizando con el nodo ${nodeUrl}: ${error.message}`, { error });
-            if (knownNodes.lengh > 2) {
-                updateKnownNodes([...knownNodes.filter(x => x !== nodeUrl)]);
+            if (listKnownNodes().lengh > 2) {
+                updateKnownNodes([...listKnownNodes().filter(x => x !== nodeUrl)]);
             }
         }
     }
-    return { status: "ok", knownNodes };
+    return { status: "ok", knownNodes: listKnownNodes() };
 }
 
 // Registrar nodo en nodos semilla
 export async function registerNode() {
-    knownNodes.filter(n => n !== localNodeUrl).forEach(async (seedUrl) => {
+    listOtherNodes().forEach(async (seedUrl) => {
         try {
             const response = await postNodes(seedUrl);
             if (response.ok) {
@@ -42,16 +42,15 @@ export async function registerNode() {
 // Registrar nodo en nodos semilla
 export function myInfo() {
     return {
-        name: nodeName,
-        url: localNodeUrl,
-        version: '0.0.2'
+        version: '0.0.2',
+        ...locaInfo()
     };
 }
 
 // Registrar nodo en los nodos semilla
 export async function networkInfo() {
     var rst = [myInfo()];
-    var otherNodes = knownNodes.filter(n => n !== localNodeUrl);
+    var otherNodes = otherNodes();
     for (let i = 0; i < otherNodes.length; i++) {
         const response = await fetch(`${otherNodes[i]}/info`);
         rst = [...rst, await response.json()];
@@ -63,13 +62,13 @@ export async function networkInfo() {
 export function registerNewNode(nodeUrl) {
     console.log('Agregando el nodo', nodeUrl);
     updateKnownNodes([nodeUrl]);
-    console.log("Nodos conocidos:", knownNodes);
-    return { message: 'Nodo agregado', knownNodes };
+    console.log("Nodos conocidos:", listKnownNodes());
+    return { message: 'Nodo agregado', knownNodes: listKnownNodes() };
 }
 
 export async function initialize() {
     console.log(`Servidor ${nodeName} iniciado en ${localNodeUrl}`);
-    console.log(`Seeds registrados ${seedNodeUrls}`);
+    console.log(`Seeds registrados ${listSeedNodes()}`);
     // Registrar el nodo en el seed después de que el servidor se inicie
     await registerNode();
     // Conectar al nodo semilla al iniciar
