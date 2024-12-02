@@ -89,7 +89,7 @@ app.get('/sync', async (req, res) => {
         } catch (error) {
             console.error(`Error sincronizando con el nodo ${nodeUrl}: ${error.message}`);
             if (knownNodes.lengh !== 0) {
-                knownNodes = [...knownNodes.filter(x => x !== localNodeUrl)];
+                knownNodes = [...knownNodes.filter(x => x !== nodeUrl)];
             }
         }
     });
