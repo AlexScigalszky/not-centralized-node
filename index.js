@@ -24,21 +24,27 @@ let knownNodes = seedNodeUrls ? [...seedNodeUrls.split(','), localNodeUrl] : [lo
 function myInfo() {
     return {
         name: nodeName,
-        version: '0.0.1'
+        url: localNodeUrl,
+        version: '0.0.2'
     };
+}
+
+// Función que envía la url de nodo local y recive los nodos conocidos
+async function postNodes(url) {
+    return await fetch(`${url}/nodes`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ nodeUrl: localNodeUrl }),
+    });
 }
 
 // Función para registrar el nodo en el semilla
 async function registerNode() {
     knownNodes.filter(n => n !== localNodeUrl).forEach(async (seedUrl) => {
         try {
-            const response = await fetch(`${seedUrl}/nodes`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ nodeUrl: localNodeUrl }),
-            });
+            const response = await postNodes(seedUrl);
             if (response.ok) {
                 console.log(`Nodo registrado: ${localNodeUrl}`);
             } else {
@@ -56,13 +62,13 @@ function syncNodes() {
     knownNodes.filter(n => n !== localNodeUrl).forEach(async (nodeUrl) => {
         try {
             console.log("Sincronizando con el nodo", nodeUrl);
-            const response = await fetch(`${nodeUrl}/nodes`);
-            const newNodes = await response.json();
-            knownNodes = [...new Set([...knownNodes, ...newNodes])];
+            const response = await postNodes(nodeUrl);
+            const status = await response.json();
+            knownNodes = [...new Set([...knownNodes, ...status.knownNodes])];
         } catch (error) {
             console.error(`Error sincronizando con el nodo ${nodeUrl}: ${error.message}`);
             if (knownNodes.lengh !== 0) {
-                knownNodes = [localNodeUrl];
+                knownNodes = [...knownNodes.filter(x => x !== nodeUrl)];
             }
         }
     });
@@ -71,28 +77,9 @@ function syncNodes() {
 
 /************ BEGIN endpoints ************/
 
-// Endpoint GET /nodes - Retorna la lista de nodos
-app.get('/nodes', (req, res) => {
-    res.json(knownNodes);
-});
-
 // Endpoint GET /sync para realizar la actualización de nodos conocidos
 app.get('/sync', async (req, res) => {
-    console.log("Sincronizando...")
-    console.log("Nodos conocidos:", knownNodes);
-    knownNodes.filter(n => n !== localNodeUrl).forEach(async (nodeUrl) => {
-        try {
-            console.log("Sincronizando con el nodo", nodeUrl);
-            const response = await fetch(`${nodeUrl}/nodes`);
-            const newNodes = await response.json();
-            knownNodes = [...new Set([...knownNodes, ...newNodes])];
-        } catch (error) {
-            console.error(`Error sincronizando con el nodo ${nodeUrl}: ${error.message}`);
-            if (knownNodes.lengh !== 0) {
-                knownNodes = [...knownNodes.filter(x => x !== nodeUrl)];
-            }
-        }
-    });
+    syncNodes();
     res.json({ status: "ok", knownNodes });
 });
 
@@ -103,11 +90,6 @@ app.post('/nodes', (req, res) => {
     knownNodes = [...new Set([...knownNodes, nodeUrl])];
     console.log("Nodos conocidos:", knownNodes);
     res.status(201).json({ message: 'Nodo agregado', knownNodes });
-});
-
-// Endpoint GET /ping - Verifica si el nodo está activo
-app.get('/ping', (req, res) => {
-    res.json({ message: 'Nodo activo' });
 });
 
 app.get('/info', (req, res) => {
