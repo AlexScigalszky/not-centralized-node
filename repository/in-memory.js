@@ -16,6 +16,7 @@ export function listSeedNodes() {
 }
 
 export function saveSeeds(seeds) {
+    seedNodes = seeds;
     saveKnownNodes(seeds);
 }
 
