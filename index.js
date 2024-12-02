@@ -7,7 +7,7 @@ const app = express();
 app.use(express.json());
 
 // Url del Nodo (la forma de identificarlo)
-const nodeUrl = process.env.NODE_URL;
+const localNodeUrl = process.env.NODE_URL;
 // Nombre del Nodo (la forma de identificarlo)
 const nodeName = process.env.NODE_NAME ?? 'unknown name';
 // Iniciar el servidor en el puerto 3000
@@ -37,10 +37,10 @@ async function registerNode() {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ nodeUrl }),
+                body: JSON.stringify({ nodeUrl: localNodeUrl }),
             });
             if (response.ok) {
-                console.log(`Nodo registrado: ${nodeUrl}`);
+                console.log(`Nodo registrado: ${localNodeUrl}`);
             } else {
                 console.error('Error al registrar el nodo:', response.statusText);
             }
@@ -62,7 +62,7 @@ function syncNodes() {
         } catch (error) {
             console.error(`Error sincronizando con el nodo ${nodeUrl}: ${error.message}`);
             if (knownNodes.lengh !== 0) {
-                knownNodes = [...knownNodes.filter(x => x !== nodeUrl)];
+                knownNodes = [...knownNodes.filter(x => x !== localNodeUrl)];
             }
         }
     });
@@ -89,19 +89,19 @@ app.get('/sync', async (req, res) => {
         } catch (error) {
             console.error(`Error sincronizando con el nodo ${nodeUrl}: ${error.message}`);
             if (knownNodes.lengh !== 0) {
-                knownNodes = [...knownNodes.filter(x => x !== nodeUrl)];
+                knownNodes = [...knownNodes.filter(x => x !== localNodeUrl)];
             }
         }
     });
-    res.json({ status: "ok" });
+    res.json({ status: "ok", knownNodes });
 });
 
 // Endpoint POST /nodes - Registra un nuevo nodo
 app.post('/nodes', (req, res) => {
     const { nodeUrl } = req.body;
     console.log('Agregando el nodo', nodeUrl);
-    if (!knownNodes.includes(nodeUrl) && nodeUrl !== nodeUrl) {
-        knownNodes.push(nodeUrl);
+    if (!knownNodes.includes(nodeUrl)) {
+        knownNodes = [...new Set([...knownNodes, nodeUrl])];
     }
     console.log("Nodos conocidos:", knownNodes);
     res.status(201).json({ message: 'Nodo agregado', knownNodes });
@@ -128,7 +128,7 @@ app.get('/network', async (req, res) => {
 /************ END endpoints ************/
 
 app.listen(port, async () => {
-    console.log(`Servidor ${nodeName} iniciado en ${nodeUrl}`);
+    console.log(`Servidor ${nodeName} iniciado en ${localNodeUrl}`);
     console.log(`Seeds registrados ${seedNodeUrls}`);
     // Registrar el nodo en el seed después de que el servidor se inicie
     await registerNode();
