@@ -1,5 +1,5 @@
 import fetch from 'node-fetch';
-import { listOtherNodes, listKnownNodes, locaInfo, listSeedNodes, updateKnownNodes } from '../repository/in-memory.js';
+import { listOtherNodes, listKnownNodes, locaInfo, listSeedNodes, saveKnownNodes } from '../repository/in-memory.js';
 
 // Sincronizar nodos
 export async function syncNodes() {
@@ -12,11 +12,11 @@ export async function syncNodes() {
             console.log("Sincronizando con el nodo", nodeUrl);
             const response = await postNodes(nodeUrl);
             const status = await response.json();
-            updateKnownNodes(status.knownNodes);
+            saveKnownNodes(status.knownNodes);
         } catch (error) {
             console.error(`Error sincronizando con el nodo ${nodeUrl}: ${error.message}`, { error });
             if (listKnownNodes().lengh > 2) {
-                updateKnownNodes([...listKnownNodes().filter(x => x !== nodeUrl)]);
+                saveKnownNodes([...listKnownNodes().filter(x => x !== nodeUrl)]);
             }
         }
     }
@@ -61,7 +61,7 @@ export async function networkInfo() {
 // Registra un nuevo nodo
 export function registerNewNode(nodeUrl) {
     console.log('Agregando el nodo', nodeUrl);
-    updateKnownNodes([nodeUrl]);
+    saveKnownNodes([nodeUrl]);
     console.log("Nodos conocidos:", listKnownNodes());
     return { message: 'Nodo agregado', knownNodes: listKnownNodes() };
 }

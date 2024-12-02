@@ -2,8 +2,8 @@ export let knownNodes = [];
 export let seedNodes = [];
 export let locaInfo = [];
 
-function updateKnownNodes(newNodes) {
-    knownNodes = [...new Set([...knownNodes, ...newNodes])];
+export function saveKnownNodes(nodes) {
+    knownNodes = [...new Set([...knownNodes, ...nodes])];
 }
 
 export function listKnownNodes() {
@@ -15,7 +15,7 @@ export function listSeedNodes() {
 }
 
 export function loadSeeds(seeds) {
-    updateKnownNodes(seeds);
+    saveKnownNodes(seeds);
 }
 
 export function setLocalInfo(info) {
