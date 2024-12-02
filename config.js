@@ -4,9 +4,9 @@ export const localNodeUrl = process.env.NODE_URL;
 export const nodeName = process.env.NODE_NAME ?? 'unknown name';
 const seedNodeUrls = process.env.SEED_NODE_URLS || '';
 
-saveLocalInfo({
+saveLocalInfo(url, {
     name: nodeName,
-    url: localNodeUrl
+    version: '0.0.3'
 });
 saveSeeds(
     seedNodeUrls ?

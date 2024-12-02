@@ -1,6 +1,7 @@
-export let knownNodes = [];
-export let seedNodes = [];
-export let locaInfo = [];
+let knownNodes = [];
+let seedNodes = [];
+let locaInfo = [];
+let localNodeUrl = '';
 
 export function saveKnownNodes(nodes) {
     knownNodes = [...new Set([...knownNodes, ...nodes])];
@@ -18,8 +19,16 @@ export function saveSeeds(seeds) {
     saveKnownNodes(seeds);
 }
 
-export function saveLocalInfo(info) {
-    locaInfo = info;
+export function saveLocalInfo(url, extra) {
+    localNodeUrl = url;
+    locaInfo = {
+        url,
+        ...extra
+    };
+}
+
+export function localInfo() {
+    return locaInfo;
 }
 
 export function listOtherNodes() {

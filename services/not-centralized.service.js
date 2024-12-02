@@ -1,5 +1,5 @@
 import fetch from 'node-fetch';
-import { listOtherNodes, listKnownNodes, locaInfo, listSeedNodes, saveKnownNodes } from '../repository/in-memory.js';
+import { listOtherNodes, listKnownNodes, localInfo, listSeedNodes, saveKnownNodes } from '../repository/in-memory.js';
 
 // Sincronizar nodos
 export async function syncNodes() {
@@ -41,10 +41,7 @@ export async function registerNode() {
 
 // Registrar nodo en nodos semilla
 export function myInfo() {
-    return {
-        version: '0.0.2',
-        ...locaInfo()
-    };
+    return localInfo();
 }
 
 // Registrar nodo en los nodos semilla
@@ -67,7 +64,7 @@ export function registerNewNode(nodeUrl) {
 }
 
 export async function initialize() {
-    console.log(`Servidor ${nodeName} iniciado en ${localNodeUrl}`);
+    console.log(`Servidor ${localInfo()}`);
     console.log(`Seeds registrados ${listSeedNodes()}`);
     // Registrar el nodo en el seed después de que el servidor se inicie
     await registerNode();
@@ -80,6 +77,6 @@ async function postNodes(url) {
     return await fetch(`${url}/nodes`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', },
-        body: JSON.stringify({ nodeUrl: localNodeUrl }),
+        body: JSON.stringify({ nodeUrl: localInfo().url }),
     });
 }
