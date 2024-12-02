@@ -64,8 +64,8 @@ export function registerNewNode(nodeUrl) {
 }
 
 export async function initialize() {
-    console.log(`Servidor ${localInfo()}`);
-    console.log(`Seeds registrados ${listSeedNodes()}`);
+    console.log(`Servidor`, localInfo());
+    console.log(`Seeds registrados`, listSeedNodes());
     // Registrar el nodo en el seed después de que el servidor se inicie
     await registerNode();
     // Conectar al nodo semilla al iniciar
