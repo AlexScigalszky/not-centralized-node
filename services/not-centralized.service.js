@@ -1,5 +1,5 @@
 import fetch from 'node-fetch';
-import { localNodeUrl, knownNodes, nodeName, updateKnownNodes } from '../config.js';
+import { localNodeUrl, knownNodes, nodeName, seedNodeUrls, updateKnownNodes } from '../config.js';
 
 // Sincronizar nodos
 export async function syncNodes() {
