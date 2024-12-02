@@ -12,11 +12,11 @@ export async function syncNodes() {
             console.log("Sincronizando con el nodo", nodeUrl);
             const response = await postNodes(nodeUrl);
             const status = await response.json();
-            knownNodes = [...new Set([...knownNodes, ...status.knownNodes])];
+            updateKnownNodes(status.knownNodes);
         } catch (error) {
             console.error(`Error sincronizando con el nodo ${nodeUrl}: ${error.message}`, { error });
             if (knownNodes.lengh > 2) {
-                knownNodes = [...knownNodes.filter(x => x !== nodeUrl)];
+                updateKnownNodes([...knownNodes.filter(x => x !== nodeUrl)]);
             }
         }
     }
@@ -62,7 +62,7 @@ export async function networkInfo() {
 // Registra un nuevo nodo
 export function registerNewNode(nodeUrl) {
     console.log('Agregando el nodo', nodeUrl);
-    knownNodes = [...new Set([...knownNodes, nodeUrl])];
+    updateKnownNodes([nodeUrl]);
     console.log("Nodos conocidos:", knownNodes);
     return { message: 'Nodo agregado', knownNodes };
 }
