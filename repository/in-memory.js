@@ -14,11 +14,11 @@ export function listSeedNodes() {
     return seedNodes;
 }
 
-export function loadSeeds(seeds) {
+export function saveSeeds(seeds) {
     saveKnownNodes(seeds);
 }
 
-export function setLocalInfo(info) {
+export function saveLocalInfo(info) {
     locaInfo = info;
 }
 
