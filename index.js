@@ -66,8 +66,8 @@ function syncNodes() {
             const status = await response.json();
             knownNodes = [...new Set([...knownNodes, ...status.knownNodes])];
         } catch (error) {
-            console.error(`Error sincronizando con el nodo ${nodeUrl}: ${error.message}`);
-            if (knownNodes.lengh !== 0) {
+            console.error(`Error sincronizando con el nodo ${nodeUrl}: ${error.message}`, { error });
+            if (knownNodes.lengh > 2) {
                 knownNodes = [...knownNodes.filter(x => x !== nodeUrl)];
             }
         }
