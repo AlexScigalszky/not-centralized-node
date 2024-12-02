@@ -40,7 +40,7 @@ export async function registerNode() {
 }
 
 // Registrar nodo en nodos semilla
-export async function myInfo() {
+export function myInfo() {
     return {
         name: nodeName,
         url: localNodeUrl,

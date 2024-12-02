@@ -29,7 +29,7 @@ app.get('/info', (req, res) => {
 
 // Endpoint que devuelve toda la información de la red
 app.get('/network', async (req, res) => {
-    res.json(networkInfo());
+    res.json(await networkInfo());
 });
 
 /************ END endpoints ************/
