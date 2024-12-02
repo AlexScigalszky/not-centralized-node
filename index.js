@@ -16,7 +16,7 @@ const port = process.env.PORT || 3000;
 const seedNodeUrls = process.env.SEED_NODE_URLS || '';
 
 // Lista en memoria de nodos conocidos
-let knownNodes = seedNodeUrls ? [...seedNodeUrls.split(',')] : [];
+let knownNodes = seedNodeUrls ? [...seedNodeUrls.split(','), localNodeUrl] : [localNodeUrl];
 
 /************ BEGIN internal functions ************/
 
@@ -30,7 +30,7 @@ function myInfo() {
 
 // Función para registrar el nodo en el semilla
 async function registerNode() {
-    knownNodes.forEach(async (seedUrl) => {
+    knownNodes.filter(n => n !== localNodeUrl).forEach(async (seedUrl) => {
         try {
             const response = await fetch(`${seedUrl}/nodes`, {
                 method: 'POST',
@@ -53,7 +53,7 @@ async function registerNode() {
 function syncNodes() {
     console.log("Sincronizando...")
     console.log("Nodos conocidos:", knownNodes);
-    knownNodes.forEach(async (nodeUrl) => {
+    knownNodes.filter(n => n !== localNodeUrl).forEach(async (nodeUrl) => {
         try {
             console.log("Sincronizando con el nodo", nodeUrl);
             const response = await fetch(`${nodeUrl}/nodes`);
@@ -62,7 +62,7 @@ function syncNodes() {
         } catch (error) {
             console.error(`Error sincronizando con el nodo ${nodeUrl}: ${error.message}`);
             if (knownNodes.lengh !== 0) {
-                knownNodes = [...knownNodes.filter(x => x !== localNodeUrl)];
+                knownNodes = [localNodeUrl];
             }
         }
     });
@@ -80,7 +80,7 @@ app.get('/nodes', (req, res) => {
 app.get('/sync', async (req, res) => {
     console.log("Sincronizando...")
     console.log("Nodos conocidos:", knownNodes);
-    knownNodes.forEach(async (nodeUrl) => {
+    knownNodes.filter(n => n !== localNodeUrl).forEach(async (nodeUrl) => {
         try {
             console.log("Sincronizando con el nodo", nodeUrl);
             const response = await fetch(`${nodeUrl}/nodes`);
@@ -100,9 +100,7 @@ app.get('/sync', async (req, res) => {
 app.post('/nodes', (req, res) => {
     const { nodeUrl } = req.body;
     console.log('Agregando el nodo', nodeUrl);
-    if (!knownNodes.includes(nodeUrl)) {
-        knownNodes = [...new Set([...knownNodes, nodeUrl])];
-    }
+    knownNodes = [...new Set([...knownNodes, nodeUrl])];
     console.log("Nodos conocidos:", knownNodes);
     res.status(201).json({ message: 'Nodo agregado', knownNodes });
 });
@@ -118,8 +116,9 @@ app.get('/info', (req, res) => {
 
 app.get('/network', async (req, res) => {
     var rst = [myInfo()];
-    for (let i = 0; i < knownNodes.length; i++) {
-        const response = await fetch(`${knownNodes[i]}/info`);
+    var otherNodes = knownNodes.filter(n => n !== localNodeUrl);
+    for (let i = 0; i < otherNodes.length; i++) {
+        const response = await fetch(`${otherNodes[i]}/info`);
         rst = [...rst, await response.json()];
     }
     res.json(rst);
