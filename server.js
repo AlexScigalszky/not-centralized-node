@@ -35,7 +35,7 @@ app.get('/network', async (req, res) => {
 
 // Endpoint POST /nodes - Registra un nuevo nodo
 app.post('/message', (req, res) => {
-    res.status(200).json(sendMessage(req.body.id, req.bodysender, req.body.message));
+    res.status(200).json(sendMessage(req.body.id, req.body.sender, req.body.message));
 });
 
 // Interfaz del nodo
