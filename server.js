@@ -144,7 +144,9 @@ app.get('/ui', async (req, res) => {
             }
           });
 
-          setTimeout(location.reload(true), 10000);
+          setTimeout(function() {
+            location.reload(true);
+          }, 10000);
         </script>
       </body>
       </html>
