@@ -129,7 +129,7 @@ app.get('/ui', async (req, res) => {
               const response = await fetch('/message', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ sender: '${name}', message })
+                body: JSON.stringify({ id: '', sender: '${name}', message })
               });
               if (response.ok) {
                 const newMessage = await response.json();
