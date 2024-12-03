@@ -5,13 +5,17 @@ import { alreadyReceived, saveMessage, listMessages } from '../repository/chat.j
 
 // Sincronizar nodos
 export async function sendMessage(id, sender, message) {
-    id = id ? id : uuidv4();
+    console.log(`Message: [${id} - ${sender}]: ${message}`);
+    if (!id){
+        id = uuidv4();
+        console.log("se creó el id", id);
+    }
     // Chequear que no sea un duplicado
     if (alreadyReceived(id)) {
         console.log(`Duplicado: [${id} - ${sender}]: ${message}`);
         return;
     }
-    console.log(`[${id} - ${sender}]: ${message}`);
+    
 
     // Guardar el mensaje localmente
     saveMessage(id, sender, message);
