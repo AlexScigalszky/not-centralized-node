@@ -31,7 +31,6 @@ app.get('/info', (req, res) => {
 app.get('/network', async (req, res) => {
     res.json(await networkInfo());
 });
-
 app.get('/ui', async (req, res) => {
     const nodes = await networkInfo();
     let html = `
@@ -48,7 +47,7 @@ app.get('/ui', async (req, res) => {
           <h1 class="text-center">Network Information</h1>
           <div class="row mt-3">
     `;
-  
+    
     nodes.forEach(node => {
       html += `
         <div class="col-md-4">
@@ -56,23 +55,39 @@ app.get('/ui', async (req, res) => {
             <div class="card-body">
               <h5 class="card-title">${node.name}</h5>
               <p class="card-text">Version: ${node.version}</p>
-              <a href="${node.url}/ui" class="btn btn-primary">Go to Node</a>
+              <a href="${node.url}/ui" class="btn btn-primary" target="_blank">Go to Node</a>
+              <button class="btn btn-secondary mt-3" onclick="syncNode('${node.url}/sync')">Syncronize</button>
             </div>
           </div>
         </div>
       `;
     });
-  
+    
     html += `
           </div>
         </div>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+        <script>
+          async function syncNode(nodeUrl) {
+            try {
+              const response = await fetch(\`\${nodeUrl}/sync\`);
+              if (response.ok) {
+                alert('Sync initiated for ' + nodeUrl);
+              } else {
+                alert('Error syncing ' + nodeUrl);
+              }
+            } catch (error) {
+              alert('Error: ' + error.message);
+            }
+          }
+        </script>
       </body>
       </html>
     `;
-  
+    
     res.send(html);
   });
+  
 
 /************ END endpoints ************/
 
