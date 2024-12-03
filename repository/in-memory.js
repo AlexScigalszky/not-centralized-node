@@ -1,7 +1,7 @@
-let knownNodes = [];
-let seedNodes = [];
-let locaInfo = [];
-let localNodeUrl = '';
+export let knownNodes = [];
+export let seedNodes = [];
+export let locaInfo = [];
+export let localNodeUrl = '';
 
 export function saveKnownNodes(nodes) {
     console.log("saveKnownNodes: nodes recibidos:", nodes);

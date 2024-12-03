@@ -1,5 +1,5 @@
 import fetch from 'node-fetch';
-import { listOtherNodes, listKnownNodes, localInfo, listSeedNodes, saveKnownNodes } from '../repository/in-memory.js';
+import { listOtherNodes, listKnownNodes, localInfo, listSeedNodes, saveKnownNodes, saveLocalInfo, saveSeeds } from '../repository/in-memory.js';
 
 // Sincronizar nodos
 export async function syncNodes() {
@@ -63,7 +63,17 @@ export function registerNewNode(nodeUrl) {
     return { message: 'Nodo agregado', knownNodes: listKnownNodes() };
 }
 
-export async function initialize() {
+export async function initialize(nodeUrl, nodeName, seedsStr) {
+    saveLocalInfo(nodeUrl, {
+        name: nodeName,
+        version: '0.0.3'
+    });
+    saveSeeds(
+        seedsStr ?
+            [...seedsStr.split(','), nodeUrl]
+            : [nodeUrl]
+    );
+
     console.log(`Servidor`, localInfo());
     console.log(`Seeds registrados`, listSeedNodes());
     // Registrar el nodo en el seed después de que el servidor se inicie

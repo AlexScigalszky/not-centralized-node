@@ -35,6 +35,11 @@ app.get('/network', async (req, res) => {
 /************ END endpoints ************/
 
 app.listen(port, async () => {
-    await initialize();
+
+    const nodeUrl = process.env.NODE_URL;
+    const nodeName = process.env.NODE_NAME ?? 'unknown name';
+    const seedsStr = process.env.SEED_NODE_URLS || '';
+    
+    await initialize(nodeUrl, nodeName, seedsStr);
 });
 
