@@ -15,5 +15,5 @@ export function listMessages() {
 }
 
 export function alreadyReceived(id) {
-    return !messages.find(x => x.id == id);
+    return messages.find(x => x.id == id);
 }
