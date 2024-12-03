@@ -1,6 +1,7 @@
 // Importar dependencias
 import express from 'express';
 import { myInfo, networkInfo, registerNewNode, syncNodes, initialize } from './services/not-centralized.service.js';
+import { listMessages } from './repository/chat.js';
 
 // Inicializar la aplicación Express
 const app = express();
@@ -41,6 +42,7 @@ app.post('/message', (req, res) => {
 // Interfaz del nodo
 app.get('/ui', async (req, res) => {
     const nodes = await networkInfo();
+    const messages = listMessages();
     let html = `
       <!doctype html>
       <html lang="en">

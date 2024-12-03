@@ -66,7 +66,7 @@ export function registerNewNode(nodeUrl) {
 export async function initialize(nodeUrl, nodeName, seedsStr) {
     saveLocalInfo(nodeUrl, {
         name: nodeName,
-        version: '0.0.3'
+        version: '0.0.4'
     });
     saveSeeds(
         seedsStr ?
