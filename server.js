@@ -40,13 +40,13 @@ app.get('/ui', async (req, res) => {
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Nodes Info</title>
+        <title>Network Info</title>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
       </head>
       <body>
         <div class="container mt-5">
-          <h1 class="text-center">Node Information</h1>
-          <div class="row">
+          <h1 class="text-center">Network Information</h1>
+          <div class="row mt-3">
     `;
   
     nodes.forEach(node => {
@@ -56,7 +56,7 @@ app.get('/ui', async (req, res) => {
             <div class="card-body">
               <h5 class="card-title">${node.name}</h5>
               <p class="card-text">Version: ${node.version}</p>
-              <a href="${node.url}" class="btn btn-primary" target="_blank">Go to Node</a>
+              <a href="${node.url}/ui" class="btn btn-primary">Go to Node</a>
             </div>
           </div>
         </div>
