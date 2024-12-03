@@ -2,6 +2,7 @@
 import express from 'express';
 import { myInfo, networkInfo, registerNewNode, syncNodes, initialize } from './services/not-centralized.service.js';
 import { listMessages } from './repository/chat.js';
+import { localInfo } from './repository/in-memory.js';
 
 // Inicializar la aplicación Express
 const app = express();
@@ -42,7 +43,9 @@ app.post('/message', (req, res) => {
 // Interfaz del nodo
 app.get('/ui', async (req, res) => {
     const nodes = await networkInfo();
+    const { name } = localInfo();
     const messages = listMessages();
+
     let html = `
       <!doctype html>
       <html lang="en">
@@ -128,12 +131,12 @@ app.get('/ui', async (req, res) => {
               const response = await fetch('/message', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ sender: '${nodeName}', message })
+                body: JSON.stringify({ sender: '${name}', message })
               });
               if (response.ok) {
                 const newMessage = await response.json();
                 document.getElementById('messagesList').innerHTML += 
-                  \`<li class="list-group-item"><strong>${nodeName}:</strong> \${message}</li>\`;
+                  \`<li class="list-group-item"><strong>${name}:</strong> \${message}</li>\`;
                 document.getElementById('messageInput').value = '';
               } else {
                 alert('Error enviando mensaje');
