@@ -143,6 +143,8 @@ app.get('/ui', async (req, res) => {
               alert('Error: ' + error.message);
             }
           });
+
+          setTimeout(location.reload(true), 10000);
         </script>
       </body>
       </html>
