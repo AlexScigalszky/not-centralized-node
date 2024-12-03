@@ -56,7 +56,7 @@ app.get('/ui', async (req, res) => {
               <h5 class="card-title">${node.name}</h5>
               <p class="card-text">Version: ${node.version}</p>
               <a href="${node.url}/ui" class="btn btn-primary">Open Node</a>
-              <button class="btn btn-secondary" onclick="syncNode('${node.url}/sync')">Syncronize</button>
+              <button class="btn btn-secondary" onclick="syncNode('${node.url}')">Syncronize</button>
             </div>
           </div>
         </div>
