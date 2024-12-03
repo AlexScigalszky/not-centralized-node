@@ -31,6 +31,14 @@ app.get('/info', (req, res) => {
 app.get('/network', async (req, res) => {
     res.json(await networkInfo());
 });
+
+// Endpoint POST /nodes - Registra un nuevo nodo
+app.post('/message', (req, res) => {
+    const { id, sender, message } = req.body;
+    res.status(200).json(sendMessage(id, sender, message));
+});
+
+// Interfaz del nodo
 app.get('/ui', async (req, res) => {
     const nodes = await networkInfo();
     let html = `
@@ -65,7 +73,34 @@ app.get('/ui', async (req, res) => {
     
     html += `
           </div>
+
+          <!-- Formulario de envío de mensajes -->
+          <div class="mt-5">
+            <h2>Enviar Mensaje</h2>
+            <form id="messageForm">
+              <div class="mb-3">
+                <label for="messageInput" class="form-label">Mensaje</label>
+                <input type="text" class="form-control" id="messageInput" required>
+              </div>
+              <button type="submit" class="btn btn-success">Enviar</button>
+            </form>
+          </div>
+
+          <!-- Mostrar mensajes recibidos -->
+          <div class="mt-5">
+            <h2>Mensajes Recibidos</h2>
+            <ul class="list-group" id="messagesList">
+    `;
+
+    messages.forEach(msg => {
+        html += `<li class="list-group-item"><strong>${msg.sender}:</strong> ${msg.message}</li>`;
+    });
+
+    html += `
+            </ul>
+          </div>
         </div>
+
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
         <script>
           async function syncNode(nodeUrl) {
@@ -80,11 +115,36 @@ app.get('/ui', async (req, res) => {
               alert('Error: ' + error.message);
             }
           }
+
+          // Manejar el envío de mensajes
+          document.getElementById('messageForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const message = document.getElementById('messageInput').value;
+            if (!message) return;
+
+            try {
+              const response = await fetch('/message', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ sender: '${nodeName}', message })
+              });
+              if (response.ok) {
+                const newMessage = await response.json();
+                document.getElementById('messagesList').innerHTML += 
+                  \`<li class="list-group-item"><strong>${nodeName}:</strong> \${message}</li>\`;
+                document.getElementById('messageInput').value = '';
+              } else {
+                alert('Error enviando mensaje');
+              }
+            } catch (error) {
+              alert('Error: ' + error.message);
+            }
+          });
         </script>
       </body>
       </html>
     `;
-    
+
     res.send(html);
   });
   
