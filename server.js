@@ -40,7 +40,7 @@ app.post('/message', (req, res) => {
 
 // Interfaz del nodo
 app.get('/ui', async (req, res) => {
-    const nodes = await networkInfo();
+    const nodes = (await networkInfo()).sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
     const { name } = myInfo();
     const messages = getMessages();
 
