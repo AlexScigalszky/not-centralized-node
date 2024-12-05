@@ -55,16 +55,16 @@ app.get('/ui', async (req, res) => {
       </head>
       <body>
         <div class="container mt-5">
-          <h1 class="text-center">Network Information</h1>
+          <h1 class="text-center">Network Information - ${name}</h1>
           <div class="row mt-3">
     `;
-    
+
     nodes.forEach(node => {
-      html += `
+        html += `
         <div class="col-md-4">
-          <div class="card">
+          <div class="card ${node.name == name ? 'border-info' : ''}">
             <div class="card-body">
-              <h5 class="card-title">${node.name}</h5>
+              <h5 class="card-title">${node.name == name ? node.name + '(local)' : node.name}</h5>
               <p class="card-text">Version: ${node.version}</p>
               <a href="${node.url}/ui" class="btn btn-primary">Open Node</a>
               <button class="btn btn-secondary" onclick="syncNode('${node.url}')">Syncronize</button>
@@ -73,7 +73,7 @@ app.get('/ui', async (req, res) => {
         </div>
       `;
     });
-    
+
     html += `
           </div>
 
@@ -153,8 +153,8 @@ app.get('/ui', async (req, res) => {
     `;
 
     res.send(html);
-  });
-  
+});
+
 
 /************ END endpoints ************/
 
